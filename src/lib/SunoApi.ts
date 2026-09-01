@@ -629,7 +629,7 @@ class SunoApi {
         title: audio.title,
         image_url: audio.image_url,
         lyric: audio.metadata.prompt,
-        audio_url: audio.audio_url,
+        audio_url: this.extractAudioUrl(audio),
         video_url: audio.video_url,
         created_at: audio.created_at,
         model_name: audio.model_name,
@@ -758,6 +758,20 @@ class SunoApi {
   }
 
   /**
+   * Suno now returns the real download URL in `media_urls` (mp3 / m4a) and
+   * leaves the legacy `audio_url` field as a "forbidden" placeholder.
+   */
+  private extractAudioUrl(audio: any): string {
+    const media: any[] = audio.media_urls || [];
+    // Prefer the m4a (CloudFront) URL — the cdn1.suno.ai mp3 is 403-gated.
+    const m4a = media.find((m) => (m.content_type || '').includes('m4a'));
+    if (m4a && m4a.url) return m4a.url;
+    const anyAudio = media.find((m) => m.url);
+    if (anyAudio && anyAudio.url) return anyAudio.url;
+    return audio.audio_url || '';
+  }
+
+  /**
    * Retrieves audio information for the given song IDs.
    * @param songIds An optional array of song IDs to retrieve information for.
    * @param page An optional page number to retrieve audio information from.
@@ -790,7 +804,7 @@ class SunoApi {
       lyric: audio.metadata.prompt
         ? this.parseLyrics(audio.metadata.prompt)
         : '',
-      audio_url: audio.audio_url,
+      audio_url: this.extractAudioUrl(audio),
       video_url: audio.video_url,
       created_at: audio.created_at,
       model_name: audio.model_name,
