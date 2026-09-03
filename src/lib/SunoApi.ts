@@ -308,55 +308,25 @@ class SunoApi {
     if (!await this.captchaRequired())
       return null;
 
-    logger.info('Turnstile captcha required. Launching browser to auto-solve...');
-    const browser = await this.launchBrowser();
-    const page = await browser.newPage();
-    await page.goto('https://suno.com/create', { referer: 'https://www.google.com/', waitUntil: 'domcontentloaded', timeout: 0 });
-    await page.waitForResponse('**/api/project/**\?**', { timeout: 60000 });
-
-    // Fill the create form via native DOM setters (React-compatible, avoids Playwright actionability timeouts)
-    await page.evaluate(() => {
-      const setVal = (el: any, val: string) => {
-        const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
-        const setter = Object.getOwnPropertyDescriptor(proto, 'value')!.set;
-        setter!.call(el, val);
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-      };
-      const tas = Array.from(document.querySelectorAll('textarea'));
-      if (tas[0]) setVal(tas[0], 'Test Psychedelic Song');
-      if (tas[1]) setVal(tas[1], 'psytrance, 150 BPM');
-      if (tas[3]) setVal(tas[3], 'Lorem ipsum psychedelic trance');
-      const l = document.querySelector('[contenteditable="true"]') as any;
-      if (l) { l.textContent = 'la la la'; l.dispatchEvent(new Event('input', { bubbles: true })); }
-    });
-    await sleep(1, 1.5);
-
-    return new Promise<string>((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error('Turnstile auto-solve timeout (120s)')), 120000);
-      page.route('**/api/generate/v2/**', async (route: any) => {
-        try {
-          const req = route.request();
-          let token = null;
-          try { token = req.postDataJSON()?.token; } catch(e) {}
-          if (token) {
-            logger.info('Turnstile token captured from browser generate request');
-            this.currentToken = req.headers().authorization?.split('Bearer ').pop();
-            clearTimeout(timer);
-            route.abort();
-            await browser.browser()?.close();
-            resolve(token);
-          } else {
-            route.continue();
-          }
-        } catch (err) {
-          clearTimeout(timer);
-          reject(err);
-        }
-      });
-      // Trigger generation (Turnstile runs in execute mode and auto-solves in the real session)
-      page.locator('button[aria-label="Create song"]').evaluate((b: any) => b.click()).catch(() => {});
-    });
+    // Suno uses hCaptcha (sitekey below) served from their own domain.
+    // Solve server-side via 2Captcha — no browser/iframe interaction needed.
+    logger.info('hCaptcha required. Solving via 2Captcha...');
+    const sitekey = 'd65453de-3f1a-4aac-9366-a0f06e52b2ce';
+    for (let j = 0; j < 3; j++) {
+      try {
+        const captcha = await this.solver.hcaptcha({
+          pageurl: 'https://suno.com/create',
+          sitekey: sitekey,
+        });
+        logger.info('hCaptcha token received: ' + (captcha.data || '').slice(0, 24) + '...');
+        return captcha.data;
+      } catch(err: any) {
+        logger.info(err.message);
+        if (j != 2) logger.info('Retrying hCaptcha...');
+        else throw err;
+      }
+    }
+    return null;
   }
 
   /**
