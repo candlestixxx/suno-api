@@ -8,18 +8,13 @@
    - Experiments (use at your own risk):
      · serverMinification
 
- ✓ Ready in 2.6s
- ○ Compiling /api/custom_generate ...
- ✓ Compiled /api/custom_generate in 1354ms (577 modules)
-{"level":30,"time":1788468205768,"pid":51088,"hostname":"LumKourlosDesktop","msg":"Getting the session ID"}
-(node:51088) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+ ✓ Ready in 4s
+ ○ Compiling /api/get ...
+ ✓ Compiled /api/get in 2.9s (577 modules)
+{"level":30,"time":1789488802719,"pid":183192,"hostname":"LumKourlosDesktop","msg":"Getting the session ID"}
+(node:183192) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-{"level":30,"time":1788468206121,"pid":51088,"hostname":"LumKourlosDesktop","msg":"KeepAlive...\n"}
-{"level":30,"time":1788468206439,"pid":51088,"hostname":"LumKourlosDesktop","msg":"KeepAlive...\n"}
-{"level":30,"time":1788468206854,"pid":51088,"hostname":"LumKourlosDesktop","required":true,"captcha_version":1}
-{"level":30,"time":1788468206854,"pid":51088,"hostname":"LumKourlosDesktop","msg":"Turnstile captcha required. Launching browser to auto-solve..."}
-{"level":30,"time":1788468213524,"pid":51088,"hostname":"LumKourlosDesktop","msg":"Sleeping for 2 seconds"}
-Error generating custom audio: Error: Turnstile auto-solve timeout (120s)
-    at Timeout.eval [as _onTimeout] (webpack-internal:///(rsc)/./src/lib/SunoApi.ts:296:49)
-    at listOnTimeout (node:internal/timers:605:17)
-    at process.processTimers (node:internal/timers:541:7)
+{"level":30,"time":1789488803108,"pid":183192,"hostname":"LumKourlosDesktop","msg":"KeepAlive...\n"}
+{"level":30,"time":1789488803250,"pid":183192,"hostname":"LumKourlosDesktop","msg":"KeepAlive...\n"}
+{"level":30,"time":1789488803406,"pid":183192,"hostname":"LumKourlosDesktop","msg":"Get audio status: https://studio-api.prod.suno.com/api/feed/v2?ids=a3446975-7cd8-4baf-a327-e3d6c05bdabb"}
+{"level":30,"time":1789488804863,"pid":183192,"hostname":"LumKourlosDesktop","msg":"RAW AUDIO: {\"audio_url\":\"https://studio-api.prod.suno.com/api/forbidden\",\"video_url\":\"\",\"media_urls\":[{\"url\":\"https://d2lwuy8qc234o3.cloudfront.net/1/clip/a3446975-7cd8-4baf-a327-e3d6c05bdabb.m4a\",\"content_type\":\"m4a-opus\",\"delivery\":\"progressive\",\"encoding\":\"1.0.0\"}],\"is_download_unlocked\":false,\"major_model_version\":\"v6\"}"}

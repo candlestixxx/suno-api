@@ -664,6 +664,7 @@ class SunoApi {
    */
   private extractAudioUrl(audio: any): string {
     const media: any[] = audio.media_urls || [];
+    logger.info('RAW AUDIO: ' + JSON.stringify({ audio_url: audio.audio_url, video_url: audio.video_url, media_urls: media, is_download_unlocked: audio.is_download_unlocked, major_model_version: audio.major_model_version }).slice(0, 800));
     const ok = (u: string) => !!u && !/audiopipe|encoded=true/.test(u);
     // Prefer the m4a (CloudFront) URL — the cdn1.suno.ai mp3 is 403-gated.
     const m4a = media.find((m) => (m.content_type || '').includes('m4a') && ok(m.url));
