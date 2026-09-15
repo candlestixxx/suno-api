@@ -513,7 +513,7 @@ class SunoApi {
       while (Date.now() - startTime < 100000) {
         const response = await this.get(songIds);
         const allCompleted = response.every(
-          (audio) => audio.status === 'streaming' || audio.status === 'complete'
+          (audio) => audio.status === 'complete'
         );
         const allError = response.every((audio) => audio.status === 'error');
         if (allCompleted || allError) {
@@ -664,12 +664,13 @@ class SunoApi {
    */
   private extractAudioUrl(audio: any): string {
     const media: any[] = audio.media_urls || [];
+    const ok = (u: string) => !!u && !/audiopipe|encoded=true/.test(u);
     // Prefer the m4a (CloudFront) URL — the cdn1.suno.ai mp3 is 403-gated.
-    const m4a = media.find((m) => (m.content_type || '').includes('m4a'));
+    const m4a = media.find((m) => (m.content_type || '').includes('m4a') && ok(m.url));
     if (m4a && m4a.url) return m4a.url;
-    const anyAudio = media.find((m) => m.url);
+    const anyAudio = media.find((m) => ok(m.url));
     if (anyAudio && anyAudio.url) return anyAudio.url;
-    return audio.audio_url || '';
+    return ok(audio.audio_url) ? audio.audio_url : '';
   }
 
   /**
